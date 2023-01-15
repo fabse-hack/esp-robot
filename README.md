@@ -1,4 +1,5 @@
 # Welcome to ESP-Robot written in Micropython
+![Logo](ESP-Robot-Micropython1.jpg)
 ***
 ## Requirements specification:
 1. ESP Microcontroller
