@@ -39,3 +39,14 @@ Beeeep, Bep, Sound. It's very easy to you a piezo buzzer for make some R2D2 nois
 ## 8. the PROGRAMM
 Is the heart of the Robot, without, it's can do nothing!
 For some month i learned Python, and so i programmed it in Micropython.
+***
+## 9. Hardware
+wiring und power delivering
+***
+
+## To-Do's and everything:
+- [ ] GitHub up2date
+- [ ] new microcontroller ESP32-S2
+- [ ] new models of the Lego Chassis
+- [ ] Programming it better
+- [ ] add some sensors
