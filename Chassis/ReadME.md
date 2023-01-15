@@ -4,9 +4,23 @@
 Let's start with Version 5
 ***
 ## Version 5
+This is the best Version
 
+Parameters:
+* big wheels
+* solid build
+* place for battery
+* place for the microcontroller & motor driver
+* place for the ultrasonic sensor in the front middle
+* power function l motors are connected at the face side
 
+Problems:
+* the wheel behind, the robot is heavy and the axle bends slightly
+* power function l motors and the lego frame not in the same level
 
+![Logo](Robot5.jpg)
+
+***
 ## Version 4
 
 Parameters:
@@ -20,13 +34,14 @@ Problems:
 
 ![Logo](Robot4.jpg)
 
-
+***
 ## Version 3
 
 Some crazy Lego Building action, the Software is easy to use!
 
 ![Logo](Robot3.jpg)
 
+***
 ## Version 2
 
 Here is the Version Number 1.
@@ -39,9 +54,9 @@ Parameters:
 Problems:
 * one side have 2 gears, another side have 3 gears
 
-
 ![Logo](Robot2.jpg)
 
+***
 ## Version 1
 
 Here is the Version Number 1.
