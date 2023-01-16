@@ -54,7 +54,7 @@ Main.py with the html website, Motor Speed, Automatic drive (in the earlist Vers
 ***
 ## 9. Hardware
 wiring und power delivering
-////// make wiring in fritzwiring or something
+![Logo](PD-Delivery.jpg)
 ***
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? Forward, 35cm, Stop, Back, Left or Right, Forward again
