@@ -41,28 +41,41 @@ Important is, that the powerbank have the power delivery. With this, can give th
 ## 6. Light
 The Robot defentily need some lights. "A robot needs a light to help it see in the dark, just like how humans need a flashlight!"
 So the Robot get some wb2812b LEDs, easy to use and found much in the network. The ESP Robot have a 3 LEDs Strip wb2812b.
+It's nice to have an adressable LED or high power LED or small Lasers. When they have 5V, it's easy to use them with a microcontroller.
 ***
 ## 7. Sound
 Beeeep, Bep, Sound. It's very easy to you a piezo buzzer for make some R2D2 noises.
 Some small piezo buzzer are avaiable in all electronic onlinestores.
+THe R2D2 Sound from main.py is mixxed with the Neopixel LEDs, there are in the same coding loop, and then the light looks soundactiv.
 ***
 ## 8. the PROGRAMM
 Is the heart of the Robot, without, it's can do nothing!
 For some month i learned Python, and so i programmed it in Micropython.
-Boot.py with Wifi-SSiD and Wifi-Password
-Main.py with the html website, Motor Speed, Automatic drive (in the earlist Version)
+boot.py with Wifi-SSiD and Wifi-Password
+main.py with the html website, Motor Speed, R2D2 Sound, Automatic drive (in the earlist Version)
+dcmotor.py is the library for the DC Motor, there are the movements inside (forward, left, right, stop)
+hcsr04.py is the library for the ultrasonic sensor, the distance is measured in centimeter.
 ***
 ## 9. Hardware
-wiring und power delivering
+this is the hardware from the ESP Robot:
+- PD-Delivery Board, with 9V for the L298N
+- Bread Board for modular wiring
+- Buzzer
+- HC-SR04 Ultra Sonic Sensor (for distance)
+- L298N Motor Driver
+- Microcontroller
+- Neopixel LED Strip with 3 LEDs
+
 ![Logo](PD-Delivery.jpg)
 ***
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? Forward, 35cm, Stop, Back, Left or Right, Forward again
 some good links and thinkings:
 braitenberg-vehikel
-
 ## To-Do's and everything:
-- [ ] new microcontroller ESP32-S2
-- [ ] new models of the Lego Chassis
-- [ ] Programming it better
-- [ ] add some sensors
+- [ ] new microcontroller ESP32-S2, in the futer maybe jetson nano
+- [ ] new models of the Lego Chassis, there is no end
+- [ ] Programming it better, there is no end
+- [ ] add some sensors e.g. ESP-Cam, HC-SR04, 360 Lidar, Linear Lidar
+- [ ] new self-driving logic's
+- [ ] Visualization and Photos
