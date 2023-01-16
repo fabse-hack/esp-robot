@@ -10,6 +10,9 @@
 6. Light (wb2812b)
 7. Sound (R2D2 Sounds)
 8. the PROGRAMM
+9. Hardware
+10. ESP Robot Self-Driving Logic
+11. To-Do's and planning
 ***
 ## 1. ESP Microcontroller
 The Robot is programmed in Micropython. So need a Microcontroller with supported Micropython.
@@ -71,11 +74,12 @@ this is the hardware from the ESP Robot:
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? Forward, 35cm, Stop, Back, Left or Right, Forward again
 some good links and thinkings:
-braitenberg-vehikel
-## To-Do's and everything:
-- [ ] new microcontroller ESP32-S2, in the futer maybe jetson nano
+braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel
+***
+## 11. To-Do's and planning:
+- [ ] new microcontroller ESP32-S2, in the futer maybe jetson nano, pi
 - [ ] new models of the Lego Chassis, there is no end
 - [ ] Programming it better, there is no end
-- [ ] add some sensors e.g. ESP-Cam, HC-SR04, 360 Lidar, Linear Lidar
+- [ ] add some sensors e.g. ESP-Cam, Cam, one more HC-SR04, 360 Lidar, Linear Lidar
 - [ ] new self-driving logic's
 - [ ] Visualization and Photos
