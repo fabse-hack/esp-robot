@@ -73,7 +73,7 @@ this is the hardware from the ESP Robot:
 ***
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? Forward, 35cm, Stop, Back, Left or Right, Forward again  
-![Logo](Auto1.gif)
+![Logo](Auto1.gif)  
 some good links and thinkings:
 braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel
 ***
