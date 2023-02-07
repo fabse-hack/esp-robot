@@ -60,7 +60,8 @@ For some month i learned Python, and so i programmed it in Micropython.
 boot.py with Wifi-SSiD and Wifi-Password
 main.py with the html website, Motor Speed, R2D2 Sound, Automatic drive (in the earlist Version)
 dcmotor.py is the library for the DC Motor, there are the movements inside (forward, left, right, stop)
-hcsr04.py is the library for the ultrasonic sensor, the distance is measured in centimeter.
+hcsr04.py is the library for the ultrasonic sensor, the distance is measured in centimeter.  
+![Logo](photos/Touch-Controll-HTML.jpg)  
 ***
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? 
