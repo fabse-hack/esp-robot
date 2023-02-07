@@ -39,7 +39,7 @@ this is the hardware from the ESP Robot:
 - Microcontroller
 - Neopixel LED Strip with 3 LEDs
 
-![Logo](PD-Delivery.jpg)  
+![Logo](photos/USB-C-PD-Delivery.jpg)  
 
 ## 6. Sensors
 HC-SR04
