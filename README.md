@@ -65,7 +65,7 @@ hcsr04.py is the library for the ultrasonic sensor, the distance is measured in 
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? 
 - Version 1: Forward, >35cm Distance measuring, Stop, Back, Left or Right, Forward again  
-![Logo](Auto1.gif)  
+![Logo](photos/Auto1.gif)  
 - some good links and thinkings:
 braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel
 STM
