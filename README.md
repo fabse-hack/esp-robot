@@ -14,7 +14,7 @@
 11. To-Do's and planning
 ***
 ## 1. Overview
-![Logo](ESP-Robot-Micropython1.jpg)
+![Logo](photos/ESP-Robot-Micropython4-html.jpg)
 ***
 ## 2. Wiring
 ***
