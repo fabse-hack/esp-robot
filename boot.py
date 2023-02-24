@@ -3,8 +3,8 @@ import gc
 #import webrepl
 
 
-ssid = 'SSID-NAME'
-password = 'WIFI-PASSWORD'
+ssid = 'idontknow'
+password = 'dumdidum'
 
 station = network.WLAN(network.STA_IF)
 

@@ -15,6 +15,11 @@
 ***
 ## 1. Overview
 ![Logo](photos/ESP-Robot-Micropython4-html.jpg)
+
+mp-remote commands:  
+python.exe -m mp-remote connect com11 cp main.py :
+python.exe -m mp-remote connect com11 cp
+
 ***
 ## 2. Wiring
 ***
