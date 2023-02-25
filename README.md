@@ -15,7 +15,7 @@
 ***
 <a name="overview"></a>  
 ## 1. Overview
-![Logo](photos/ESP-Robot-Micropython4-html.jpg)
+![Logo](photos/ESP-Robot-Micropython4.png)
 
 mp-remote commands:  
 - this command upload the main.py to the micropython board over com11  
