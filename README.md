@@ -1,11 +1,11 @@
 # Welcome to ESP-Robot written in Micropython
 ***
 ## Requirements specification:
-1. Overview
+1. [Overview](#Overview)
 2. Wiring
 3. Lego Chassis
 4. Lego DC Motors
-5. Hardware
+5. [Hardware](#hardware)
 6. Sensors (HC-SR04)
 7. Light (wb2812b)
 8. Sound (R2D2 Sounds)
@@ -17,23 +17,34 @@
 ![Logo](photos/ESP-Robot-Micropython4-html.jpg)
 
 mp-remote commands:  
-python.exe -m mp-remote connect com11 cp main.py :
-python.exe -m mp-remote connect com11 cp
+- this command upload the main.py to the micropython board over com11  
+`python.exe -m mpremote connect com11 cp main.py :`  
+- this command connects to the python prompt over com11  
+`python.exe -m mpremote connect com11`
 
 ***
+<br>
+
 ## 2. Wiring
 ***
+<br>
+
 ## 3. Lego Chassis
 Yes, there are a lot of chassis on the market here. If you look closer, they are only made of sheet metal or fall apart just by looking at them. A modular base is needed - Lego!
 The Robot is designed with Studio 2.0, here is the download link:
-https://www.bricklink.com/v3/studio/download.page
+[Bricklink Studio 2.0](https://www.bricklink.com/v3/studio/download.page)
 ***
+<br>
+
 ## 4. Lego DC Motors
 Of course, since the chassis is based on Lego, it's smart to use Lego motors.
 2x Power Functions L
-Here is the link:
-https://www.bricklink.com/v2/catalog/catalogitem.page?S=88003-1
+Here is the link:  
+[Lego Power Functions L](https://www.bricklink.com/v2/catalog/catalogitem.page?S=88003-1)
 ***
+<br>
+
+<a name="hardware"></a>
 ## 5. Hardware
 this is the hardware from the ESP Robot:
 - PD-Delivery Board, with 9V for the L298N
@@ -49,6 +60,9 @@ this is the hardware from the ESP Robot:
 ## 6. Sensors
 HC-SR04
 ***
+<br>
+
+
 ## 7. Light
 The Robot defentily need some lights. "A robot needs a light to help it see in the dark, just like how humans need a flashlight!"
 So the Robot get some wb2812b LEDs, easy to use and found much in the network. The ESP Robot have a 3 LEDs Strip wb2812b.
@@ -59,7 +73,9 @@ Beeeep, Bep, Sound. It's very easy to you a piezo buzzer for make some R2D2 nois
 Some small piezo buzzer are avaiable in all electronic onlinestores.
 THe R2D2 Sound from main.py is mixxed with the Neopixel LEDs, there are in the same coding loop, and then the light looks soundactiv.  
 ![Logo](photos/Buzzer.png)  
-***
+***  
+<br>
+
 ## 9. the PROGRAMM
 Is the heart of the Robot, without, it's can do nothing!
 For some month i learned Python, and so i programmed it in Micropython.
@@ -69,14 +85,16 @@ dcmotor.py is the library for the DC Motor, there are the movements inside (forw
 hcsr04.py is the library for the ultrasonic sensor, the distance is measured in centimeter.  
 ![Logo](photos/Touch-Controll-HTML.jpg)  
 ***
+<br>
+
 ## 10. ESP Robot Self-Driving Logic
 What does the ESP Robot do? 
 - Version 1: Forward, >35cm Distance measuring, Stop, Back, Left or Right, Forward again  
 ![Logo](photos/Auto1.gif)  
-- some good links and thinkings:
-braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel
-STM
-***
+- some good links and thinkings:  
+  - braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel  
+  - SLAM (with 360° Lidar or Linear Lidar, Jetson Board?)
+***  
 ## 11. To-Do's and planning:
 - [x] new microcontroller ESP32-S2
 - [ ] jetson nano / pi
