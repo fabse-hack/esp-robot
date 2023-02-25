@@ -44,7 +44,7 @@ this is the hardware from the ESP Robot:
 - Microcontroller
 - Neopixel LED Strip with 3 LEDs
 
-![Logo](photos/USB-C-PD-Delivery.jpg)  
+![Logo](photos/USB-CPowerDelivery.png)  
 
 ## 6. Sensors
 HC-SR04
@@ -57,7 +57,8 @@ It's nice to have an adressable LED or high power LED or small Lasers. When they
 ## 8. Sound
 Beeeep, Bep, Sound. It's very easy to you a piezo buzzer for make some R2D2 noises.
 Some small piezo buzzer are avaiable in all electronic onlinestores.
-THe R2D2 Sound from main.py is mixxed with the Neopixel LEDs, there are in the same coding loop, and then the light looks soundactiv.
+THe R2D2 Sound from main.py is mixxed with the Neopixel LEDs, there are in the same coding loop, and then the light looks soundactiv.  
+![Logo](photos/Buzzer.png)  
 ***
 ## 9. the PROGRAMM
 Is the heart of the Robot, without, it's can do nothing!
