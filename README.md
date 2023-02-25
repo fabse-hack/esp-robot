@@ -79,7 +79,7 @@ So the Robot get some wb2812b LEDs, easy to use and found much in the network. T
 It's nice to have an adressable LED or high power LED or small Lasers. When they have 5V, it's easy to use them with a microcontroller.
 ***
 <br>
-<a name="sound"></a>
+<a name="sounds"></a>
 
 ## 8. Sound
 Beeeep, Bep, Sound. It's very easy to you a piezo buzzer for make some R2D2 noises.
