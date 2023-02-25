@@ -112,7 +112,8 @@ def auto_mode():                                                                
             print('motor forward auto END')
 
 
-async def web_server():                                                                   # definition web server
+
+async def handle_connection(reader, writer):                                                                   # definition web server
     html = """<!DOCTYPE html>
 <html>
 <head>
@@ -147,14 +148,14 @@ background-color: #838383;
 <div><button class="button">
 <pre>
 ___
- / () \.
+ / () \ 
 _|_____|_
 | | === | |
 |_|  O  |_|
 ||  O  ||
 ||__*__||
 |~ \___/ ~|
-/=\  /=\  /=\.
+ /=\ /=\ /=\ 
 </pre>
 </button></div>
 </form>
@@ -233,46 +234,59 @@ _|_____|_
 </html>
     """
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('', 80))
-    s.listen(1)
+    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # s.bind(('', 80))
+    # s.listen(1)
     
-    while True:
-        conn, addr = s.accept()
-        request = conn.recv(1024)
-        request = str(request)
+    # while True:
+    #     conn, addr = s.accept()
+    #     request = conn.recv(1024)
+    #     request = str(request)
+    request = await reader.read(1024)
+    request = str(request)
 
-        CMD_forward = request.find('/?CMD=forward')
-        CMD_back = request.find('/?CMD=back')
-        CMD_left = request.find('/?CMD=left')
-        CMD_right = request.find('/?CMD=right')
-        CMD_stop = request.find('/?CMD=stop')
-        CMD_buzzer = request.find('/?CMD=buzzer')
-        CMD_auto = request.find('/?CMD=auto')
+    CMD_forward = request.find('/?CMD=forward')
+    CMD_back = request.find('/?CMD=back')
+    CMD_left = request.find('/?CMD=left')
+    CMD_right = request.find('/?CMD=right')
+    CMD_stop = request.find('/?CMD=stop')
+    CMD_buzzer = request.find('/?CMD=buzzer')
+    CMD_auto = request.find('/?CMD=auto')
 
-        if CMD_forward == 6:
-            print('+forward')
-            dc_motor.forward(40)
-        elif CMD_back == 6:
-            print('+backwards')
-            dc_motor.backwards(40)
-        elif CMD_left == 6:
-            print('+left')
-            dc_motor.left(28)
-        elif CMD_right == 6:
-            print('+right')
-            dc_motor.right(28)
-        elif CMD_stop == 6:
-            print('+stop')
-            dc_motor.stop()
-        elif CMD_buzzer == 6:
-            print('+buzzer')
-            buzzer()
-        elif CMD_auto == 6:
-            print('+auto')
-            auto_mode()
-        conn.sendall(html)
-        conn.close()
+    if CMD_forward == 6:
+        print('+forward')
+        dc_motor.forward(40)
+    elif CMD_back == 6:
+        print('+backwards')
+        dc_motor.backwards(40)
+    elif CMD_left == 6:
+        print('+left')
+        dc_motor.left(28)
+    elif CMD_right == 6:
+        print('+right')
+        dc_motor.right(28)
+    elif CMD_stop == 6:
+        print('+stop')
+        dc_motor.stop()
+    elif CMD_buzzer == 6:
+        print('+buzzer')
+        buzzer()
+    elif CMD_auto == 6:
+        print('+auto')
+        auto_mode()
+
+    writer.write(html)
+    await writer.drain()
+
+    writer.close()
+    await writer.wait_closed()
+    
+async def web_server():
+    server = await asyncio.start_server(handle_connection, "0.0.0.0", 80)
+    
+    await asyncio.sleep(10)
+    #server.close()
+    await server.wait_closed()
 
 if __name__ == "__main__":
         asyncio.run(web_server())
