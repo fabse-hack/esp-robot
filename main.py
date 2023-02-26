@@ -8,6 +8,7 @@ import socket
 import hcsr04
 import time
 import uasyncio as asyncio
+import _thread
 
 # --- PARAMETERS BEGINNING ---
 # pin out number
@@ -51,7 +52,7 @@ def randint(min, max):
 def buzzer():
     buzzer = PWM(Pin(21, Pin.OUT), freq=randint(140,400), duty=randint(112,300))    # pin, freq, duty
     for i in range(randint(3,10)):                                                  # buzzer loop
-        np = neopixel.NeoPixel(machine.Pin(2), 3)                                  # here is the neopixel in the buzzer loop
+        np = neopixel.NeoPixel(machine.Pin(2), 3)                                   # here is the neopixel in the buzzer loop
         for pixel_id in range(0, len(np)):                                          # random color neopixel
             red = randint(0, 255)
             green = randint(0, 255)
@@ -73,7 +74,6 @@ def buzzer():
 
 
 # import time
-
 # def accelerate(motor, start_speed, end_speed, time_step):                         # accelerate testing
 #     speed = start_speed
 #     while speed < end_speed:
@@ -84,11 +84,14 @@ def buzzer():
 # # Beispielaufruf
 # accelerate(dc_motor, 0, 20, 0.1)
 
+stop_flag = False
 
 def auto_mode():                                                                    # auto mode
+    global stop_flag
     dc_motor.forward(20)                                                            # forward without loop
     print('motor forward auto START')
-    while True:
+    while not stop_flag:
+        time.sleep(0.5)
         distance = sensor.distance_cm()                                             # check the distance TRUE?
         if distance <= 35:                                                          # 35 cm
             dc_motor.stop()                                                         # under 35cm STOP
@@ -110,11 +113,16 @@ def auto_mode():                                                                
             print('motor STOP AUTO + sleep')
             dc_motor.forward(20)                                                    # forward again
             print('motor forward auto END')
+    stop_flag = False
 
 
+def stop_auto():
+    global stop_flag
+    stop_flag = True
 
-async def handle_connection(reader, writer):                                                                   # definition web server
-    html = """<!DOCTYPE html>
+
+async def handle_connection(reader, writer):                                        # handle connection reader and write from webserver
+    html= """<!DOCTYPE html>
 <html>
 <head>
 <style>
@@ -144,6 +152,14 @@ background-color: #838383;
 </style>
 </head>
 <body>
+
+
+
+<form class="row">
+<div id="output"></div>
+</form>
+
+
 <form class="row">
 <div><button class="button">
 <pre>
@@ -234,59 +250,80 @@ _|_____|_
 </html>
     """
 
-    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # s.bind(('', 80))
-    # s.listen(1)
-    
-    # while True:
-    #     conn, addr = s.accept()
-    #     request = conn.recv(1024)
-    #     request = str(request)
     request = await reader.read(1024)
     request = str(request)
 
-    CMD_forward = request.find('/?CMD=forward')
+    CMD_forward = request.find('/?CMD=forward')                                         # CMD Buttons on html site
     CMD_back = request.find('/?CMD=back')
     CMD_left = request.find('/?CMD=left')
     CMD_right = request.find('/?CMD=right')
     CMD_stop = request.find('/?CMD=stop')
     CMD_buzzer = request.find('/?CMD=buzzer')
     CMD_auto = request.find('/?CMD=auto')
+    
+    output = ''
+    
 
     if CMD_forward == 6:
         print('+forward')
+        stop_auto()
+        print('+auto_stopped')
         dc_motor.forward(40)
     elif CMD_back == 6:
         print('+backwards')
+        stop_auto()
         dc_motor.backwards(40)
     elif CMD_left == 6:
         print('+left')
+        stop_auto()
+        print('+auto_stopped')
         dc_motor.left(28)
     elif CMD_right == 6:
         print('+right')
+        stop_auto()
+        print('+auto_stopped')
         dc_motor.right(28)
     elif CMD_stop == 6:
-        print('+stop')
+        print('+all_stop')
         dc_motor.stop()
+        stop_auto()                                                             # stop_auto() flag wird gesetzt
     elif CMD_buzzer == 6:
-        print('+buzzer')
+        output = '+buzzer'
+        print(output)
+#        print('+buzzer')
         buzzer()
     elif CMD_auto == 6:
         print('+auto')
-        auto_mode()
+        _thread.start_new_thread(auto_mode, ())
+    # else:
+    #     status = 'Idle'
+    
+    
+    output_div = '<div>' + output + '</div>'  # create new div with output
+    html = html.replace('<div id="output"></div>', output_div)  # replace empty div with new div
+
+
 
     writer.write(html)
     await writer.drain()
+    
 
     writer.close()
     await writer.wait_closed()
-    
-async def web_server():
+
+
+async def web_server():                                                                 # this is the webserver start
     server = await asyncio.start_server(handle_connection, "0.0.0.0", 80)
-    
     await asyncio.sleep(10)
-    #server.close()
     await server.wait_closed()
 
-if __name__ == "__main__":
-        asyncio.run(web_server())
+
+# if __name__ == "__main__":                                                              # normal python start
+#     asyncio.run(web_server())
+
+# _thread.start_new_thread(asyncio.run, (web_server(),))
+# _thread.start_new_thread(auto_mode, ())
+
+
+if __name__ == "__main__":                                                              # normal python start
+    _thread.start_new_thread(asyncio.run, (web_server(),))
