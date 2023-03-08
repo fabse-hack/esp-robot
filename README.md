@@ -30,7 +30,7 @@ The ESP Lego Robot is a low budget project. You will need:
 **All together arround 55 $**  
 
 
-![Logo](photos/ESP-Robot-Micropython4.png)
+![Logo](photos/ESP-Robot-Micropython.png)
 
 This the mp-remote commands for the ESP32 S3 board:  
 - this command upload the main.py to the micropython board over com11  
@@ -81,8 +81,8 @@ For more informations visit the website:
 ![Logo](photos/ESP32-Leaf-S3.png)  
 
 
-Power delivery circuit, USB-C with 3 DIP-Switches, it's for setting the DC power. The Power Function L Motors need 9 Volt, so i take the setting 9 Volt.  
-**PD-Delivery Board USB-C :**
+Power delivery circuit, USB-C with 3 DIP-Switches, it's for setting the DC power. The Power Function L Motors need 9 Volt, so i take the 9 Volt setting. [here is the link](https://de.aliexpress.com/item/1005004874144607.html)  
+**PD-Delivery Board USB-C :**  
 ![Logo](photos/USB-CPowerDelivery.png)  
 
 
@@ -125,7 +125,7 @@ THe R2D2 Sound from main.py is mixxed with the Neopixel LEDs, there are in the s
 <a name="programm"></a>
 
 ## 9. Display
-So the Robot needs a Display, i chosse the ili9341 Touchscreen Display. The touch i not use yet, only the display for show some informations. In this Version 1 the Display shows the Wifi Network IP and the currently Status.  
+So the Robot needs a Display, i chosse the ili9341 Touchscreen Display. The touch i not use yet, only the display for show some informations. In this Version 1 the Display shows the Wifi Network IP and the currently Status. The micropython library comes from this github repository [rdagger](https://github.com/rdagger/micropython-ili9341)  
 **ili9341 Display :**  
 ![Logo](photos/ili9341.png)
 ***
