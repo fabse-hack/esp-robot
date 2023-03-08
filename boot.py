@@ -1,6 +1,5 @@
 import network
 import gc
-#import webrepl
 
 
 ssid = 'idontknow'
@@ -17,6 +16,4 @@ while station.isconnected() == False:
 print('Connection successful')
 print(station.ifconfig())
 
-
-#webrepl.start()
 gc.collect()

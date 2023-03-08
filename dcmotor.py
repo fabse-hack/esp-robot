@@ -1,11 +1,13 @@
+import time
+
 class DCMotor:      
-  def __init__(self, pin1, pin2, pin3, pin4, enablea_pin, enableb_pin, min_duty=750, max_duty=1023):
+  def __init__(self, pin1, pin2, pin3, pin4, enablea, enableb, min_duty=750, max_duty=1023):
     self.pin1=pin1
     self.pin2=pin2
     self.pin3=pin3
     self.pin4=pin4
-    self.enablea_pin=enablea_pin
-    self.enableb_pin=enableb_pin
+    self.enablea_pin=enablea
+    self.enableb_pin=enableb
     self.min_duty = min_duty
     self.max_duty = max_duty
 
@@ -45,7 +47,14 @@ class DCMotor:
     self.pin3.value(0)
     self.pin4.value(1)
 
-  def stop(self):
+  def stop(self, speed):
+    step = 5
+    while speed > 0:
+      self.speed(speed)
+      speed -= step
+      time.sleep(0.1)
+    self.speed = 0
+    time.sleep(0.01)
     self.enablea_pin.duty(0)
     self.enableb_pin.duty(0)
     self.pin1.value(0)

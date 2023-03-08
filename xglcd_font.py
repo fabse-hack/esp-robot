@@ -1,4 +1,3 @@
-"""XGLCD Font Utility."""
 from math import ceil, floor
 
 

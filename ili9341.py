@@ -17,6 +17,7 @@ def color565(r, g, b):
     return (r & 0xf8) << 8 | (g & 0xfc) << 3 | b >> 3
 
 
+
 class Display(object):
     """Serial interface for 16-bit color (5-6-5 RGB) IL9341 display.
 
@@ -90,7 +91,7 @@ class Display(object):
     }
 
     def __init__(self, spi, cs, dc, rst,
-                 width=240, height=320, rotation=0):
+                 width=320, height=240, rotation=90):
         """Initialize OLED.
 
         Args:
@@ -108,30 +109,21 @@ class Display(object):
         self.rst = rst
         self.width = width
         self.height = height
-        if rotation not in self.ROTATE.keys():
-            raise RuntimeError('Rotation must be 0, 90, 180 or 270.')
-        else:
-            self.rotation = self.ROTATE[rotation]
+        # if rotation not in self.ROTATE.keys():
+        #     raise RuntimeError('Rotation must be 0, 90, 180 or 270.')
+        # else:
+        self.rotation = self.ROTATE[rotation]
 
-        # Initialize GPIO pins and set implementation specific methods
-        if implementation.name == 'circuitpython':
-            self.cs.switch_to_output(value=True)
-            self.dc.switch_to_output(value=False)
-            self.rst.switch_to_output(value=True)
-            self.reset = self.reset_cpy
-            self.write_cmd = self.write_cmd_cpy
-            self.write_data = self.write_data_cpy
-        else:
-            self.cs.init(self.cs.OUT, value=1)
-            self.dc.init(self.dc.OUT, value=0)
-            self.rst.init(self.rst.OUT, value=1)
-            self.reset = self.reset_mpy
-            self.write_cmd = self.write_cmd_mpy
-            self.write_data = self.write_data_mpy
+        self.cs.init(self.cs.OUT, value=1)
+        self.dc.init(self.dc.OUT, value=0)
+        self.rst.init(self.rst.OUT, value=1)
+        self.reset = self.reset_mpy
+        self.write_cmd = self.write_cmd_mpy
+        self.write_data = self.write_data_mpy
         self.reset()
         # Send initialization commands
         self.write_cmd(self.SWRESET)  # Software reset
-        sleep(.1)
+        sleep(.02)
         self.write_cmd(self.PWCTRB, 0x00, 0xC1, 0x30)  # Pwr ctrl B
         self.write_cmd(self.POSC, 0x64, 0x03, 0x12, 0x81)  # Pwr on seq. ctrl
         self.write_cmd(self.DTCA, 0x85, 0x00, 0x78)  # Driver timing ctrl A
@@ -154,9 +146,9 @@ class Display(object):
         self.write_cmd(self.GMCTRN1, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07, 0x31,
                        0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F)
         self.write_cmd(self.SLPOUT)  # Exit sleep
-        sleep(.1)
+        sleep(.02)
         self.write_cmd(self.DISPLAY_ON)  # Display on
-        sleep(.1)
+        sleep(.02)
         self.clear()
 
     def block(self, x0, y0, x1, y1, data):
@@ -171,7 +163,6 @@ class Display(object):
         """
         self.write_cmd(self.SET_COLUMN, *ustruct.pack(">HH", x0, x1))
         self.write_cmd(self.SET_PAGE, *ustruct.pack(">HH", y0, y1))
-
         self.write_cmd(self.WRITE_RAM)
         self.write_data(data)
 
@@ -346,10 +337,8 @@ class Display(object):
                            x2, chunk_y + remainder - 1,
                            buf)
 
-    def draw_letter(self, x, y, letter, font, color, background=0,
-                    landscape=False):
+    def draw_letter(self, x, y, letter, font, color):
         """Draw a letter.
-
         Args:
             x (int): Starting X position.
             y (int): Starting Y position.
@@ -359,24 +348,10 @@ class Display(object):
             background (int): RGB565 background color (default: black).
             landscape (bool): Orientation (default: False = portrait)
         """
-        buf, w, h = font.get_letter(letter, color, background, landscape)
-        # Check for errors (Font could be missing specified letter)
-        if w == 0:
-            return w, h
-
-        if landscape:
-            y -= w
-            if self.is_off_grid(x, y, x + h - 1, y + w - 1):
-                return 0, 0
-            self.block(x, y,
-                       x + h - 1, y + w - 1,
-                       buf)
-        else:
-            if self.is_off_grid(x, y, x + w - 1, y + h - 1):
-                return 0, 0
-            self.block(x, y,
-                       x + w - 1, y + h - 1,
-                       buf)
+        buf, w, h = font.get_letter(letter, color)
+        if w == 0: return w, h
+        if self.is_off_grid(x, y, x + w - 1, y + h - 1): return 0, 0
+        self.block(x, y, x + w - 1, y + h - 1, buf)
         return w, h
 
     def draw_line(self, x1, y1, x2, y2, color):
@@ -518,8 +493,7 @@ class Display(object):
             return
         self.block(x, y, x2, y2, buf)
 
-    def draw_text(self, x, y, text, font, color,  background=0,
-                  landscape=False, spacing=1):
+    def draw_text(self, x, y, text, font, color, spacing=1):
         """Draw text.
 
         Args:
@@ -532,33 +506,12 @@ class Display(object):
             landscape (bool): Orientation (default: False = portrait)
             spacing (int): Pixels between letters (default: 1)
         """
-        for letter in text:
-            # Get letter array and letter dimensions
-            w, h = self.draw_letter(x, y, letter, font, color, background,
-                                    landscape)
-            # Stop on error
-            if w == 0 or h == 0:
-                print('Invalid width {0} or height {1}'.format(w, h))
-                return
-
-            if landscape:
-                # Fill in spacing
-                if spacing:
-                    self.fill_hrect(x, y - w - spacing, h, spacing, background)
-                # Position y for next letter
-                y -= (w + spacing)
-            else:
-                # Fill in spacing
-                if spacing:
-                    self.fill_hrect(x + w, y, spacing, h, background)
-                # Position x for next letter
-                x += (w + spacing)
-
-                # # Fill in spacing
-                # if spacing:
-                #     self.fill_vrect(x + w, y, spacing, h, background)
-                # # Position x for next letter
-                # x += w + spacing
+        for i, letter in enumerate(text):
+            w, h = self.draw_letter(x, y, letter, font, color)
+            #if w == 0 or h == 0: return
+            if spacing and i < len(text)-1:
+                self.fill_hrect(x + w, y, spacing, h, 0)
+            x += (w + spacing)
 
     def draw_text8x8(self, x, y, text, color,  background=0,
                      rotate=0):
@@ -721,25 +674,33 @@ class Display(object):
             h (int): Height of rectangle.
             color (int): RGB565 color value.
         """
+        # if self.is_off_grid(x, y, x + w - 1, y + h - 1):
+        #     return
+        # chunk_height = 1024 // w
+        # chunk_count, remainder = divmod(h, chunk_height)
+        # chunk_size = chunk_height * w
+        # chunk_y = y
+        # if chunk_count:
+        #     buf = color.to_bytes(2, 'big') * chunk_size
+        #     for c in range(0, chunk_count):
+        #         self.block(x, chunk_y,
+        #                    x + w - 1, chunk_y + chunk_height - 1,
+        #                    buf)
+        #         chunk_y += chunk_height
+
+        # if remainder:
+        #     buf = color.to_bytes(2, 'big') * remainder * w
+        #     self.block(x, chunk_y,
+        #                x + w - 1, chunk_y + remainder - 1,
+        #                buf)
         if self.is_off_grid(x, y, x + w - 1, y + h - 1):
             return
-        chunk_height = 1024 // w
-        chunk_count, remainder = divmod(h, chunk_height)
-        chunk_size = chunk_height * w
-        chunk_y = y
-        if chunk_count:
-            buf = color.to_bytes(2, 'big') * chunk_size
-            for c in range(0, chunk_count):
-                self.block(x, chunk_y,
-                           x + w - 1, chunk_y + chunk_height - 1,
-                           buf)
-                chunk_y += chunk_height
+        buf = color.to_bytes(2, 'big') * w
+        for i in range(y, y + h):
+            self.block(x, i, x + w - 1, i, buf)
 
-        if remainder:
-            buf = color.to_bytes(2, 'big') * remainder * w
-            self.block(x, chunk_y,
-                       x + w - 1, chunk_y + remainder - 1,
-                       buf)
+
+
 
     def fill_rectangle(self, x, y, w, h, color):
         """Draw a filled rectangle.
@@ -881,19 +842,8 @@ class Display(object):
         Returns:
             boolean: False = Coordinates OK, True = Error.
         """
-        if xmin < 0:
-            print('x-coordinate: {0} below minimum of 0.'.format(xmin))
-            return True
-        if ymin < 0:
-            print('y-coordinate: {0} below minimum of 0.'.format(ymin))
-            return True
-        if xmax >= self.width:
-            print('x-coordinate: {0} above maximum of {1}.'.format(
-                xmax, self.width - 1))
-            return True
-        if ymax >= self.height:
-            print('y-coordinate: {0} above maximum of {1}.'.format(
-                ymax, self.height - 1))
+        if xmin < 0 or ymin < 0 or xmax >= self.width or ymax >= self.height:
+            print('Invalid coordinates: x={0}, y={1}, width={2}, height={3}'.format(xmin, ymin, xmax-xmin+1, ymax-ymin+1))
             return True
         return False
 
@@ -917,9 +867,9 @@ class Display(object):
         Notes: CircuitPython implemntation
         """
         self.rst.value = False
-        sleep(.05)
+        sleep(.02)
         self.rst.value = True
-        sleep(.05)
+        sleep(.02)
 
     def reset_mpy(self):
         """Perform reset: Low=initialization, High=normal operation.
@@ -927,9 +877,9 @@ class Display(object):
         Notes: MicroPython implemntation
         """
         self.rst(0)
-        sleep(.05)
+        sleep(.02)
         self.rst(1)
-        sleep(.05)
+        sleep(.02)
 
     def scroll(self, y):
         """Scroll display vertically.
@@ -1028,3 +978,9 @@ class Display(object):
         self.spi.write(data)
         self.spi.unlock()
         self.cs.value = True
+
+            
+    def fill_rect(self, x, y, width, height, color):
+        for i in range(height):
+            for j in range(width):
+                self.draw_pixel(x+j, y+i, color)
