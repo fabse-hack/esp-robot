@@ -50,7 +50,7 @@ This the mp-remote commands for the ESP32 S3 board:
 Yes, there are a lot of chassis on the market here. If you look closer, they are only made of sheet metal or fall apart just by looking at them. A modular base is needed - Lego!
 The Robot is designed with Studio 2.0, here is the download link:
 [Bricklink Studio 2.0](https://www.bricklink.com/v3/studio/download.page)  
-![Logo](chassis/Robot5.png)
+![Logo](Chassis/Robot5.png)
 ***
 <br>
 
