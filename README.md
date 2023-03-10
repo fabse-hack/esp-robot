@@ -20,14 +20,15 @@
 ## 1. Overview
 The ESP Lego Robot is a low budget project. You will need:
 - some Legos (or another chassis)
-- Power Bank with PD (Power Delivery Out)
+- Power Bank with PD (Power Delivery Out 9V for the motors)
 - 2x ower Function L Motors - both arround 50$ or buy some other brick motors 10$ (or another chassis)
 - L298 N Motor Driver-  2,50 $
 - ESP32 S3 - arround 20 $
 - HC-SR04 Sensor - 3 $
 - optional Buzzer and Neopixel LEDs - arround 4 $
 - optional Display ili9341 15 $  
-**All together arround 55 $**  
+**basic components together arround 35,50 $**  
+**All together with Buzzer, Neopixel and Display arround 55 $**  
 
 
 ![Logo](photos/ESP-Robot-Micropython.png)
@@ -43,13 +44,17 @@ This the mp-remote commands for the ESP32 S3 board:
 <a name="wiring"></a>
 
 ## 2. Wiring
+this is the wiring:
+![Logo](photos/wiring.png)  
+I have also uploaded the frtzing file. The controller is unfortunately a similar ESP32-S2/S3 dev kit. Power Delivery I also have another one built into the plan. I hope the Wiring Plan helps you anyway.
 ***
 <br>
 
 ## 3. Lego Chassis
-Yes, there are a lot of chassis on the market here. If you look closer, they are only made of sheet metal or fall apart just by looking at them. A modular base is needed - Lego!
+Yes, there are a lot of chassis on the market, if you look closer, they are only made of sheet metal or fall apart just by looking at them. A modular base is needed - Lego! There is a super tool for Lego, the Studio 2.0. If you have another platform or another chassis, you can build your own robot creation.
 The Robot is designed with Studio 2.0, here is the download link:
 [Bricklink Studio 2.0](https://www.bricklink.com/v3/studio/download.page)  
+You can read the whole story of the lego chassis here: [Lego Chassis](https://github.com/FabseRobotics/esp-robot/tree/main/Chassis)  
 ![Logo](Chassis/Robot5.png)
 ***
 <br>
@@ -57,7 +62,7 @@ The Robot is designed with Studio 2.0, here is the download link:
 <a name="lego-dc-motors"></a>
 
 ## 4. Lego DC Motors
-For the Lego Chassis i chosse two DC Power Function L Motors. Four wire connector, i use the 2 wire in the middle for forward / backward.
+For the Lego chassis I choose two DC Power Function L motors. These motors have a four wire connection. I use the 2 wires in the middle, these control the DC motor clockwise / anticlockwise rotation:
 Here is the link:
 [Lego Power Functions L](https://www.bricklink.com/v2/catalog/catalogitem.page?S=88003-1)  
 **Lego Power Function L :**  
@@ -106,8 +111,7 @@ This is the only sensor of the ESP32 Robot. In the future i will add some more t
 
 ## 7. Light
 The Robot defentily need some lights. "A robot needs a light to help it see in the dark, just like how humans need a flashlight!"
-So the Robot get some wb2812b LEDs, easy to use and found much in the network. The ESP Robot have a 3 LEDs Strip wb2812b.
-It's nice to have an adressable LED or high power LED or small Lasers. When they have 5V, it's easy to use them with a microcontroller.  
+So the Robot get some wb2812b LEDs, easy to use and found much in the network. The ESP Robot have a 3 LEDs Strip wb2812b. It's nice to have an adressable LED or high power LED or small Lasers. When they have 5V, it's easy to use them with a microcontroller.  
 **Neopixel WB2812b :**  
 ![Logo](photos/NeoPixel.png)  
 ***
@@ -134,7 +138,7 @@ So the Robot needs a Display, i chosse the ili9341 Touchscreen Display. The touc
 
 ## 10. the PROGRAMM
 Is the heart of the Robot, without, it's can do nothing!
-For some month i learned Python, and so i programmed it in Micropython.
+For some months i learned Python, and so i programmed it in Micropython.
 I'm not explain here the micropython programm, because i write in the code many comments...  
 This is the webserver with the touch buttons:
 ![Logo](photos/Touch-Controll-HTML.jpg)  
@@ -144,13 +148,10 @@ This is the webserver with the touch buttons:
 
 ## 11. ESP Robot Self-Driving Logic
 What does the ESP Robot do? 
-- Forward, >35cm Distance measuring, Stop, Back, Left or Right, Forward again  
+- Forward, >35cm Distance measuring, Stop, Backward, Left or Right, Forward again  
   
 ![Logo](photos/Auto1.gif)  
 
-- some good links and thinkings:  
-  - braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel  
-  - SLAM (with 360° Lidar or Linear Lidar, Jetson Board?)
 ***  
 <br>
 <a name="to-dos"></a>
@@ -161,6 +162,8 @@ What does the ESP Robot do?
 - [ ] Programming it better, there is no end
 - [ ] add some sensors e.g. ESP-Cam, Cam, one more HC-SR04
 - [ ] 360° Lidar Sensor with mapping
-- [ ] new self-driving logic's
+- [ ] new self-driving logic's and algorithms
 - [ ] Visualization and Photos
+- [ ] SLAM (Mapping) with 360° Lidar Sensors
+- [ ] braitenberg-vehikel -> https://de.wikipedia.org/wiki/Braitenberg-Vehikel  
 ***
