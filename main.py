@@ -1,5 +1,5 @@
 from dcmotor import DCMotor
-from machine import Pin, SPI, PWM, I2C
+from machine import Pin, SPI, PWM
 import machine
 import neopixel
 from time import sleep
@@ -16,76 +16,65 @@ import network
 
 # --- PARAMETERS BEGINNING ---
 # -- pin out numbers --
-# pin 20: neopixel
+# pin 2: neopixel
 # pin 21: buzzer
-# pin 35: hc-sr04 trigger
-# pin 45: hc-sr04 echo
+# pin 40: hc-sr04 trigger
+# pin 44: hc-sr04 echo
 # pin 39: pin1
 # pin 38: pin2
 # pin 47: enablea
-# pin 37: pin3
+# pin 43: pin3
 # pin 36: pin4
 # pin 48: enableb
-
-
+# pin 12: sck display
+# pin 11: mosi display
+# pin 3 : dc display
+# pin 10: cs display
+# pin 8 : rst display
 frequency = 15000
-
-# pins to sensor / gadget / activator
+# pins for HC-SR04
 sensor = hcsr04.HCSR04(40, 44)
-
+# pins for L298N
 pin1 = Pin(39, Pin.OUT)    
 pin2 = Pin(38, Pin.OUT)     
 enablea = PWM(Pin(47), frequency)
 pin3 = Pin(43, Pin.OUT)
 pin4 = Pin(36, Pin.OUT)
 enableb = PWM(Pin(48), frequency)
-
 # dc motor parameter   
 dc_motor = DCMotor(pin1, pin2, pin3, pin4, enablea, enableb, 350, 1023)
-
-# display + font
+# pins for display + font
 spi = SPI(2, baudrate=80000000, sck=Pin(12), mosi=Pin(11))
 display = Display(spi, dc=Pin(3), cs=Pin(10), rst=Pin(8))
-
 # Global Flags
 stop_flag = False
-
 # --- PARAMETERS END ---
 
-# randint (random integer)
-def randint(min, max):
+def randint(min, max):                                                              # randint (random integer)
     span = max - min + 1
     div = 0x3fffffff // span
     offset = urandom.getrandbits(30) // div
     val = min + offset
     return val
 
-# buzzer and neopixel
 def buzzer():
     buzzer = PWM(Pin(21, Pin.OUT), freq=randint(140,400), duty=randint(112,300))    # pin, freq, duty
     for i in range(randint(3,10)):                                                  # buzzer loop
-        np = neopixel.NeoPixel(machine.Pin(2), 3)                                   # here is the neopixel in the buzzer loop
+        np = neopixel.NeoPixel(machine.Pin(2), 3)                                   # here is the neopixel in the buzzer loop, Neopixel on pin2 and 3 leds
         for pixel_id in range(0, len(np)):                                          # random color neopixel
-            red = randint(0, 255)
+            red = randint(0, 255)                                                   # red / green / blue random integer 0 to 255
             green = randint(0, 255)
             blue = randint(0, 255)
-            np[pixel_id] = (red, green, blue)
-        tones = {
-            'c': randint(150,400),
-            }
-        melody = 'c'
-        rhythm = [8]
-        for tone, length in zip(melody, rhythm):
-            buzzer.freq(tones[tone])
-            sleep(randint(0.07,0.10))                                              # sleeping between the tones
-        np.write()
+            np[pixel_id] = (red, green, blue)                                       # set the color to the neopixel strip
+        buzzer.freq(randint(150,400))
+        sleep(randint(0.07,0.10))                                                   # sleeping between the tones
+        np.write()                                                                  # writing color to the pixel strip
     buzzer.deinit()
     for i in range(3):
-        np[i] = (0, 0, 0)
+        np[i] = (0, 0, 0)                                                           # turn off Neopixel
     np.write()
 
-
-# def accelerate(motor, start_speed, end_speed, time_step):                          # accelerate testing
+# def accelerate(motor, start_speed, end_speed, time_step):                          # accelerate testing / is now in the DC Library from def stop()
 #     speed = start_speed
 #     while speed < end_speed:
 #         motor.forward(speed)
@@ -97,7 +86,7 @@ def buzzer():
 
 
 def auto_mode():                                                                    # auto mode
-    global stop_flag
+    global stop_flag                                                                # global flag
     stop_flag = False
     dc_motor.forward(70)                                                            # forward without loop
     print('motor forward auto START')
@@ -131,12 +120,12 @@ def auto_mode():                                                                
             display_text('FORWARD AUTO     ')
             print('auto_mode forward 20 end')
 
-def stop_auto():
-    global stop_flag
+def stop_auto():                                                                    # stop_auto
+    global stop_flag                                                                # global flag
     stop_flag = True
 
 async def handle_connection(reader, writer):                                        # handle connection reader and write from webserver
-    html= """<!DOCTYPE html>
+    html= """<!DOCTYPE html>                                                        # html code for the website
 <html>
 <head>
 <style>
@@ -282,7 +271,7 @@ _|_____|_
         stop_auto()
         print('+auto_stopped')
         dc_motor.forward(70)
-        #display_text('FORWARD  ')
+        #display_text('FORWARD  ')                                                      # the display text is still laggy ....
     elif CMD_back == 6:
         print('+backwards')
         stop_auto()
@@ -303,7 +292,7 @@ _|_____|_
     elif CMD_stop == 6:
         print('+all_stop')
         dc_motor.stop(0)
-        stop_auto()                                                                   # stop_auto() flag wird gesetzt
+        stop_auto()                                                                   # set stop_auto() flag
         #display_text('ALL STOP ')
     elif CMD_buzzer == 6:
         print('+buzzer')
@@ -314,8 +303,8 @@ _|_____|_
         display_text('AUTOMATIC   ')
         _thread.start_new_thread(auto_mode, ())
     
-    output_div = '<div>' + output + '</div>'  # create new div with output
-    html = html.replace('<div id="output"></div>', output_div)  # replace empty div with new div
+    output_div = '<div>' + output + '</div>'                                        # create new div with output
+    html = html.replace('<div id="output"></div>', output_div)                      # replace empty div with new div
     
     writer.write(html)
     await writer.drain()
@@ -323,13 +312,13 @@ _|_____|_
     writer.close()
     await writer.wait_closed()
 
-def display_screen():
+def display_screen():                                                               # set the display on startup, Name + IP + Booting ...
     display.draw_text(20, 2, 'ESP ROBOT STATUS', XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
     display.draw_text(2, 42, station.ifconfig()[0], XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
     display.fill_hrect(0, 30, 320, 3, color565(128, 128, 128))
     display.draw_text(2, 82, 'BOOTING..     ', XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
 
-def display_text(text):
+def display_text(text):                                                             # definition for the display text with font
     display.draw_text(2, 82, text, XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
 
 async def web_server():                                                                 # this is the webserver start
