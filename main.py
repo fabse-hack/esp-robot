@@ -1,18 +1,17 @@
 from dcmotor import DCMotor
-from machine import Pin, SPI, PWM
+from machine import Pin, SPI, PWM, SoftI2C
 import machine
 import neopixel
 from time import sleep
 import urandom
-import socket
 import hcsr04
 import time
 import uasyncio as asyncio
-import _thread
-from ili9341 import Display, color565
-from time import sleep
-from xglcd_font import XglcdFont
-import network
+import ADXL345
+from ili934xnew import ILI9341, color565
+import tt32
+#from qmc5883 import QMC5883
+#from hmc5883l import HMC5883L
 
 # --- PARAMETERS BEGINNING ---
 # -- pin out numbers --
@@ -45,10 +44,16 @@ enableb = PWM(Pin(48), frequency)
 dc_motor = DCMotor(pin1, pin2, pin3, pin4, enablea, enableb, 350, 1023)
 # pins for display + font
 spi = SPI(2, baudrate=80000000, sck=Pin(12), mosi=Pin(11))
-display = Display(spi, dc=Pin(3), cs=Pin(10), rst=Pin(8))
+display = ILI9341(spi, dc=Pin(3), cs=Pin(10), rst=Pin(8), w=320, h=240, r=3)
 # Global Flags
 stop_flag = False
+# ADXL345
+i2c = SoftI2C(scl=Pin(15),sda=Pin(16), freq=400000)
+adx = ADXL345.ADXL345(i2c)
 # --- PARAMETERS END ---
+
+#compass = HMC5883L(scl=6, sda=7)
+
 
 def randint(min, max):                                                              # randint (random integer)
     span = max - min + 1
@@ -57,7 +62,7 @@ def randint(min, max):                                                          
     val = min + offset
     return val
 
-def buzzer():
+async def buzzer():
     buzzer = PWM(Pin(21, Pin.OUT), freq=randint(140,400), duty=randint(112,300))    # pin, freq, duty
     for i in range(randint(3,10)):                                                  # buzzer loop
         np = neopixel.NeoPixel(machine.Pin(2), 3)                                   # here is the neopixel in the buzzer loop, Neopixel on pin2 and 3 leds
@@ -67,7 +72,7 @@ def buzzer():
             blue = randint(0, 255)
             np[pixel_id] = (red, green, blue)                                       # set the color to the neopixel strip
         buzzer.freq(randint(150,400))
-        sleep(randint(0.07,0.10))                                                   # sleeping between the tones
+        await asyncio.sleep(randint(0.07,0.10))                                                   # sleeping between the tones
         np.write()                                                                  # writing color to the pixel strip
     buzzer.deinit()
     for i in range(3):
@@ -85,174 +90,43 @@ def buzzer():
 # accelerate(dc_motor, 0, 20, 0.1)
 
 
-def auto_mode():                                                                    # auto mode
+async def auto_mode():                                                                    # auto mode
     global stop_flag                                                                # global flag
     stop_flag = False
-    dc_motor.forward(70)                                                            # forward without loop
-    print('motor forward auto START')
-    display_text('FORWARD AUTO  ')
+    dc_motor.forward(60)                                                            # forward without loop
+    display_text('FORWARD')
     while not stop_flag:
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
         distance = sensor.distance_cm()                                             # check the distance TRUE?
-        if distance <= 45:                                                          # 45 cm
+        if distance <= 15:                                                          # 45 cm
             dc_motor.stop(0)                                                         # under 35cm STOP
-            print('motor backwards auto')
-            display_text('BACKWARD AUTO  ')
-            dc_motor.backwards(70)                                                  # backwards
-            time.sleep(0.8)
+            display_text('BACKWARD')
+            dc_motor.backwards(65)                                                  # backwards
+            await asyncio.sleep(0.8)
             dc_motor.stop(0) 	                                                    # stop
-            time.sleep(0.3)
+            await asyncio.sleep(0.3)
             if randint(0,1) == 0:                                                   # random 0 or 1, when 0
-                dc_motor.left(50)                                                   # left
-                print('auto_mode left')
-                display_text('LEFT AUTO      ')
-                time.sleep(0.4)
+                dc_motor.left(60)                                                   # left
+                display_text('LEFT AUTO')
+                await asyncio.sleep(0.6)
             else:
-                dc_motor.right(50)                                                  # when 1 - right
-                print('auto_mode right')
-                display_text('RIGHT AUTO      ')
-                time.sleep(0.4)
+                dc_motor.right(60)                                                  # when 1 - right
+                display_text('RIGHT AUTO')
+                await asyncio.sleep(0.6)
             dc_motor.stop(0)
-            time.sleep(0.3)
-            print('motor STOP AUTO + sleep')
-            display_text('STOP AUTO       ')
-            dc_motor.forward(70)                                                    # forward again
-            display_text('FORWARD AUTO     ')
-            print('auto_mode forward 20 end')
+            await asyncio.sleep(0.5)
+            display_text('STOP AUTO')
+            dc_motor.forward(60)                                                    # forward again
+            display_text('FORWARD')
 
 def stop_auto():                                                                    # stop_auto
     global stop_flag                                                                # global flag
     stop_flag = True
 
 async def handle_connection(reader, writer):                                        # handle connection reader and write from webserver
-    html= """<!DOCTYPE html>                                                        # html code for the website
-<html>
-<head>
-<style>
-body {
-background-color: #1b1b1b;
-color: #ffffff
-}
-.row {
-display: flex;
-justify-content: center;
-font-size: 20px;
-padding-top: 10 px;
-}
-.button {
-margin-right: 10px;
-background-color: #181818;
-color: #ffffff;
-font-size: 20px;
-border: 0;
-}
-.button:hover {
-background-color: #585858;
-}
-.button:active {
-background-color: #838383;
-}
-</style>
-</head>
-<body>
-
-
-
-<form class="row">
-<div id="output"></div>
-</form>
-
-
-<form class="row">
-<div><button class="button">
-<pre>
-___
- / () \ 
-_|_____|_
-| | === | |
-|_|  O  |_|
-||  O  ||
-||__*__||
-|~ \___/ ~|
- /=\ /=\ /=\ 
-</pre>
-</button></div>
-</form>
-<form class="row">
-<div><button class="button" name="CMD" value="forward" type="submit">
-<pre>
- -*-*-*-*-*-
-#           #
-#  Forwards #
-#           #
- -*-*-*-*-*-
-</pre>
-</button></div>
-</form>
-<form class="row">
-<div><button class="button" name="CMD" value="left" type="submit">
-<pre>
- -*-*-*-*-*-
-#           #
-#   Left    #
-#           #
- -*-*-*-*-*-
-</pre>
-</button></div>
-<div><button class="button" name="CMD" value="stop" type="submit">
-<pre>
- -*-*-*-*-*-
-#           #
-#   Stop    #
-#           #
- -*-*-*-*-*-
-</pre>
-</button></div>
-<div><button class="button" name="CMD" value="right" type="submit">
- <pre>
- -*-*-*-*-*-
-#           #
-#   Right   #
-#           #
- -*-*-*-*-*-
-</pre>
-</button></div>
-</form>
-<form class="row">
-<div><button class="button" name="CMD" value="backward" type="submit">
-<pre>
- -*-*-*-*-*-
-#           #
-# Backwards #
-#           #
- -*-*-*-*-*-
-</pre>
-</button></div>
-</form>
-<form class="row">
-<div><button class="button" name="CMD" value="auto" type="submit">
-<pre>
--*-*-*-*-*-
-#           #
-#   Auto    #
-#           #
--*-*-*-*-*-
-</pre>
-</button></div>
-<div><button class="button" name="CMD" value="buzzer" type="submit">
-<pre>
--*-*-*-*-*-
-#           #
-#  Buzzer   #
-#           #
--*-*-*-*-*-
-</pre>
-</button></div>
-</form>
-</body>
-</html>
-    """
-
+    with open('robot.html', 'r') as f:
+        html = f.read()
+    
     request = await reader.read(1024)
     request = str(request)
 
@@ -271,37 +145,37 @@ _|_____|_
         stop_auto()
         print('+auto_stopped')
         dc_motor.forward(70)
-        #display_text('FORWARD  ')                                                      # the display text is still laggy ....
+        display_text('FORWARD')                                                      # the display text is still laggy ....
     elif CMD_back == 6:
         print('+backwards')
         stop_auto()
         dc_motor.backwards(70)
-        #display_text('BACKWARD ')
+        display_text('BACKWARD')
     elif CMD_left == 6:
         print('+left')
         stop_auto()
         print('+auto_stopped')
         dc_motor.left(50)
-        #display_text('LEFT     ')
+        display_text('LEFT')
     elif CMD_right == 6:
         print('+right')
         stop_auto()
         print('+auto_stopped')
         dc_motor.right(50)
-        #display_text('RIGHT    ')
     elif CMD_stop == 6:
         print('+all_stop')
         dc_motor.stop(0)
         stop_auto()                                                                   # set stop_auto() flag
-        #display_text('ALL STOP ')
+        display_text('ALL STOP')
     elif CMD_buzzer == 6:
         print('+buzzer')
-        buzzer()
-        display_text('BUZZER      ')
+        display_text('BUZZER')
+        asyncio.create_task(buzzer())
     elif CMD_auto == 6:
         print('+auto')
-        display_text('AUTOMATIC   ')
-        _thread.start_new_thread(auto_mode, ())
+        display_text('AUTOMATIC')
+        asyncio.create_task(auto_mode())
+        #asyncio.create_task(txt_writing())
     
     output_div = '<div>' + output + '</div>'                                        # create new div with output
     html = html.replace('<div id="output"></div>', output_div)                      # replace empty div with new div
@@ -312,20 +186,66 @@ _|_____|_
     writer.close()
     await writer.wait_closed()
 
-def display_screen():                                                               # set the display on startup, Name + IP + Booting ...
-    display.draw_text(20, 2, 'ESP ROBOT STATUS', XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
-    display.draw_text(2, 42, station.ifconfig()[0], XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
-    display.fill_hrect(0, 30, 320, 3, color565(128, 128, 128))
-    display.draw_text(2, 82, 'BOOTING..     ', XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
-
 def display_text(text):                                                             # definition for the display text with font
-    display.draw_text(2, 82, text, XglcdFont('Code_Bold.c', 27, 28), color565(255, 255, 255))
+    display.set_font(tt32)
+    display.fill_rectangle(x=120, y=50, w=197, h=30)
+    display.print2(text, x=120, y=50)
+    
+def dashboard():
+    display.erase()
+    display.print2("ESP-Robot", x=80, y=8)
+    display.print2("Status:", x=10, y=50)
+    display.print2("booting...", x=120, y=50)
+    display.print2("Compass", x=5, y=84)
+    display.print2("Distance", x=194, y=84)
+    display.print2("cm", x=260, y=115)
+    display.fill_rectangle(x=0, y=0, w=320, h=2, color=0xF800)
+    display.fill_rectangle(x=0, y=0, w=2, h=240, color=0xF800)
+    display.fill_rectangle(x=228, y=0, w=320, h=2, color=0xF800)
+    display.fill_rectangle(x=0, y=42, w=320, h=2, color=0xF800)
+    display.fill_rectangle(x=0, y=46, w=320, h=2, color=0xF800)
+    display.fill_rectangle(x=0, y=81, w=320, h=2, color=0xF800)
+    display.fill_rectangle(x=0, y=238, w=320, h=2, color=0xF800)
+    display.fill_rectangle(x=180, y=81, w=2, h=159, color=0xF800)
+    display.fill_rectangle(x=318, y=0, w=2, h=240, color=0xF800)
+
+async def dash_1():
+    while True:
+        distance1 = int(sensor.distance_cm())
+        x = adx.xValue
+        y = adx.yValue
+        display.print2("x: %d, y: %d" % (x, y), x=2, y=155)
+        display.print2('%03d' % distance1, x=194, y=115)
+        await asyncio.sleep(0.5)
 
 async def web_server():                                                                 # this is the webserver start
     server = await asyncio.start_server(handle_connection, "0.0.0.0", 80)
     await asyncio.sleep(10)
     await server.wait_closed()
 
-if __name__ == "__main__":                                                              # normal python start
-    _thread.start_new_thread(asyncio.run, (web_server(),))
-    display_screen()
+async def txt_writing():
+    with open('daten.txt', 'a') as f:
+        while True:
+            abstand = sensor.distance_cm()
+            x = adx.xValue
+            y = adx.yValue
+            now = time.time()
+            seconds = int(now)
+            local_time = time.localtime(seconds)
+            hour = local_time[3]
+            minute = local_time[4]
+            second = local_time[5]
+            time_string = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
+            f.write(time_string + ',' + str(abstand) + ',' + str(x) + ',' + str(y) + '\n')
+            await asyncio.sleep(1)
+
+
+async def main():
+    task1 = asyncio.create_task(web_server())
+    #task2 = asyncio.create_task(txt_writing())
+    task3 = asyncio.create_task(dash_1())
+    await asyncio.gather(task1, task3)
+
+if __name__ == "__main__": 
+    dashboard()
+    asyncio.run(main())

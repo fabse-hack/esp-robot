@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: #1b1b1b;
+            color: #ffffff
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            font-size: 20px;
+            padding-top: 10 px;
+        }
+
+        .button {
+            margin-right: 10px;
+            background-color: #181818;
+            color: #ffffff;
+            font-size: 20px;
+            border: 0;
+        }
+
+        .button:hover {
+            background-color: #585858;
+        }
+
+        .button:active {
+            background-color: #838383;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form class="row">
+        <div id="output"></div>
+    </form>
+
+
+    <form class="row">
+        <div><button class="button">
+                <pre>
+___
+ / () \ 
+_|_____|_
+| | === | |
+|_|  O  |_|
+||  O  ||
+||__*__||
+|~ \___/ ~|
+ /=\ /=\ /=\ 
+</pre>
+            </button></div>
+    </form>
+    <form class="row">
+        <div><button class="button" name="CMD" value="forward" type="submit">
+                <pre>
+ -*-*-*-*-*-
+#           #
+#  Forwards #
+#           #
+ -*-*-*-*-*-
+</pre>
+            </button></div>
+    </form>
+    <form class="row">
+        <div><button class="button" name="CMD" value="left" type="submit">
+                <pre>
+ -*-*-*-*-*-
+#           #
+#   Left    #
+#           #
+ -*-*-*-*-*-
+</pre>
+            </button></div>
+        <div><button class="button" name="CMD" value="stop" type="submit">
+                <pre>
+ -*-*-*-*-*-
+#           #
+#   Stop    #
+#           #
+ -*-*-*-*-*-
+</pre>
+            </button></div>
+        <div><button class="button" name="CMD" value="right" type="submit">
+                <pre>
+ -*-*-*-*-*-
+#           #
+#   Right   #
+#           #
+ -*-*-*-*-*-
+</pre>
+            </button></div>
+    </form>
+    <form class="row">
+        <div><button class="button" name="CMD" value="backward" type="submit">
+                <pre>
+ -*-*-*-*-*-
+#           #
+# Backwards #
+#           #
+ -*-*-*-*-*-
+</pre>
+            </button></div>
+    </form>
+    <form class="row">
+        <div><button class="button" name="CMD" value="auto" type="submit">
+                <pre>
+-*-*-*-*-*-
+#           #
+#   Auto    #
+#           #
+-*-*-*-*-*-
+</pre>
+            </button></div>
+        <div><button class="button" name="CMD" value="buzzer" type="submit">
+                <pre>
+-*-*-*-*-*-
+#           #
+#  Buzzer   #
+#           #
+-*-*-*-*-*-
+</pre>
+            </button></div>
+    </form>
+</body>
+
+</html>
