@@ -10,6 +10,8 @@ import uasyncio as asyncio
 import ADXL345
 from ili934xnew import ILI9341, color565
 import tt32
+import network
+import gc
 #from qmc5883 import QMC5883
 #from hmc5883l import HMC5883L
 
@@ -66,18 +68,27 @@ async def buzzer():
     buzzer = PWM(Pin(21, Pin.OUT), freq=randint(140,400), duty=randint(112,300))    # pin, freq, duty
     for i in range(randint(3,10)):                                                  # buzzer loop
         np = neopixel.NeoPixel(machine.Pin(2), 3)                                   # here is the neopixel in the buzzer loop, Neopixel on pin2 and 3 leds
+        np2 = neopixel.NeoPixel(machine.Pin(48), 1)
         for pixel_id in range(0, len(np)):                                          # random color neopixel
             red = randint(0, 255)                                                   # red / green / blue random integer 0 to 255
             green = randint(0, 255)
             blue = randint(0, 255)
             np[pixel_id] = (red, green, blue)                                       # set the color to the neopixel strip
+        for pixel_id in range(0, len(np2)):                                          # random color neopixel
+            red = randint(0, 255)                                                   # red / green / blue random integer 0 to 255
+            green = randint(0, 255)
+            blue = randint(0, 255)
+            np2[pixel_id] = (red, green, blue)                                       # set the color to the neopixel strip
         buzzer.freq(randint(150,400))
-        await asyncio.sleep(randint(0.07,0.10))                                                   # sleeping between the tones
+        await asyncio.sleep(randint(0.07,0.10))                                     # sleeping between the tones
         np.write()                                                                  # writing color to the pixel strip
+        np2.write()
     buzzer.deinit()
     for i in range(3):
         np[i] = (0, 0, 0)                                                           # turn off Neopixel
     np.write()
+    np2[0] = (0, 0, 0)
+    np2.write()
 
 # def accelerate(motor, start_speed, end_speed, time_step):                          # accelerate testing / is now in the DC Library from def stop()
 #     speed = start_speed
@@ -239,13 +250,48 @@ async def txt_writing():
             f.write(time_string + ',' + str(abstand) + ',' + str(x) + ',' + str(y) + '\n')
             await asyncio.sleep(1)
 
-
 async def main():
     task1 = asyncio.create_task(web_server())
     #task2 = asyncio.create_task(txt_writing())
     task3 = asyncio.create_task(dash_1())
     await asyncio.gather(task1, task3)
 
-if __name__ == "__main__": 
+
+def configure_wifi():
+    def connect_to_wifi(ssid, password):
+        wlan = network.WLAN(network.STA_IF)
+        wlan.active(True)
+
+        if not wlan.isconnected():
+            print('Verbindung zum WLAN herstellen...')
+            wlan.connect(ssid, password)
+            while not wlan.isconnected():
+                pass
+        print('Verbunden mit:', ssid)
+        print('IP-Adresse:', wlan.ifconfig()[0])
+
+    def create_access_point(ssid, password):
+        ap = network.WLAN(network.AP_IF)
+        ap.active(True)
+        ap.config(essid=ssid, password=password)
+        print('Access Point erstellt:')
+        print('SSID:', ssid)
+        print('Passwort:', password)
+        print('IP-Adresse:', ap.ifconfig()[0])
+
+    desired_ssid = 'idontknow'
+    desired_password = 'dumdidum'
+    ap_ssid = 'ESP-Robot'
+    ap_password = '12345678'
+
+    try:
+        connect_to_wifi(desired_ssid, desired_password)
+    except:
+        print('Verbindung zum WLAN nicht möglich. Erstelle Access Point...')
+        create_access_point(ap_ssid, ap_password)
+
+
+if __name__ == "__main__":
+    configure_wifi()
     dashboard()
     asyncio.run(main())
