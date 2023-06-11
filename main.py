@@ -18,6 +18,7 @@ import gc
 # --- PARAMETERS BEGINNING ---
 # -- pin out numbers --
 # pin 2: neopixel
+# pin 48: neopixel 2
 # pin 21: buzzer
 # pin 40: hc-sr04 trigger
 # pin 44: hc-sr04 echo
@@ -26,7 +27,7 @@ import gc
 # pin 47: enablea
 # pin 43: pin3
 # pin 36: pin4
-# pin 48: enableb
+# pin 45: enableb
 # pin 12: sck display
 # pin 11: mosi display
 # pin 3 : dc display
@@ -41,7 +42,7 @@ pin2 = Pin(38, Pin.OUT)
 enablea = PWM(Pin(47), frequency)
 pin3 = Pin(43, Pin.OUT)
 pin4 = Pin(36, Pin.OUT)
-enableb = PWM(Pin(48), frequency)
+enableb = PWM(Pin(45), frequency)
 # dc motor parameter   
 dc_motor = DCMotor(pin1, pin2, pin3, pin4, enablea, enableb, 350, 1023)
 # pins for display + font
