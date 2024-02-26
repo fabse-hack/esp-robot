@@ -12,8 +12,6 @@ from ili934xnew import ILI9341, color565
 import tt32
 import network
 import gc
-#from qmc5883 import QMC5883
-#from hmc5883l import HMC5883L
 
 # --- PARAMETERS BEGINNING ---
 # -- pin out numbers --
@@ -55,7 +53,6 @@ i2c = SoftI2C(scl=Pin(15),sda=Pin(16), freq=400000)
 adx = ADXL345.ADXL345(i2c)
 # --- PARAMETERS END ---
 
-#compass = HMC5883L(scl=6, sda=7)
 
 
 def randint(min, max):                                                              # randint (random integer)
@@ -90,16 +87,6 @@ async def buzzer():
     np.write()
     np2[0] = (0, 0, 0)
     np2.write()
-
-# def accelerate(motor, start_speed, end_speed, time_step):                          # accelerate testing / is now in the DC Library from def stop()
-#     speed = start_speed
-#     while speed < end_speed:
-#         motor.forward(speed)
-#         speed += 1
-#         time.sleep(time_step)
-
-# # Beispielaufruf
-# accelerate(dc_motor, 0, 20, 0.1)
 
 
 async def auto_mode():                                                                    # auto mode
@@ -187,7 +174,6 @@ async def handle_connection(reader, writer):                                    
         print('+auto')
         display_text('AUTOMATIC')
         asyncio.create_task(auto_mode())
-        #asyncio.create_task(txt_writing())
     
     output_div = '<div>' + output + '</div>'                                        # create new div with output
     html = html.replace('<div id="output"></div>', output_div)                      # replace empty div with new div
@@ -235,27 +221,11 @@ async def web_server():                                                         
     await asyncio.sleep(10)
     await server.wait_closed()
 
-async def txt_writing():
-    with open('daten.txt', 'a') as f:
-        while True:
-            abstand = sensor.distance_cm()
-            x = adx.xValue
-            y = adx.yValue
-            now = time.time()
-            seconds = int(now)
-            local_time = time.localtime(seconds)
-            hour = local_time[3]
-            minute = local_time[4]
-            second = local_time[5]
-            time_string = "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
-            f.write(time_string + ',' + str(abstand) + ',' + str(x) + ',' + str(y) + '\n')
-            await asyncio.sleep(1)
 
 async def main():
     task1 = asyncio.create_task(web_server())
-    #task2 = asyncio.create_task(txt_writing())
-    task3 = asyncio.create_task(dash_1())
-    await asyncio.gather(task1, task3)
+    task2 = asyncio.create_task(dash_1())
+    await asyncio.gather(task1, task2)
 
 
 def configure_wifi():
@@ -280,8 +250,8 @@ def configure_wifi():
         print('Passwort:', password)
         print('IP-Adresse:', ap.ifconfig()[0])
 
-    desired_ssid = 'idontknow'
-    desired_password = 'dumdidum'
+    desired_ssid = 'WIFI_SSID'
+    desired_password = 'WIFI_PASSWORD'
     ap_ssid = 'ESP-Robot'
     ap_password = '12345678'
 
